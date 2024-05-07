@@ -19,7 +19,7 @@ app.register_blueprint(swagger_ui_blueprint)
 
 class ReservaModel(db.Model):
     __tablename__ = "reserva"
-    id = db.Column(db.Integer, primary_key=True)
+    idreserva = db.Column(db.Integer, primary_key=True)
     idHotel = db.Column(db.Integer, nullable=False)
     idQuarto = db.Column(db.Integer, nullable=False)
     dataIni = db.Column(db.Date, nullable=False)
@@ -28,9 +28,9 @@ class ReservaModel(db.Model):
 
 def toDict(reserva):
     return {
-        "id": reserva.id,
-        "idHotel": reserva.idHotel,
-        "idQuarto": reserva.idQuarto,
+        "idreserva": reserva.idreserva,
+        "idhotel": reserva.idHotel,
+        "idquarto": reserva.idQuarto,
         "dataIni": reserva.dataIni,
         "dataFin": reserva.dataFin
     }
@@ -83,15 +83,15 @@ def hasConflict(data, dataIni, dataFin):
 
 def deleteReserva(idReserva):
     try:
-        reserva = ReservaModel.query.filter_by(id=idReserva).first()
+        reserva = ReservaModel.query.filter_by(idreserva=idReserva).first()
         if not reserva:
-            return False
+            return None
         db.session.delete(reserva)
         db.session.commit()
         return reserva
     except ValueError as err:
         print(f"Erro ao deletar a reserva: {err}")
-        return False
+        return None
 
 
 @app.route('/reservar/<int:idhotel>/<int:idquarto>', methods=['GET'])
@@ -100,7 +100,6 @@ def consultarReserva(idhotel, idquarto):
     reservaDict = []
     for reserva in reservas:
         reservaDict.append(toDict(reserva))
-    print(reservaDict)
 
     if reservas:
         return jsonify(reservaDict), 200

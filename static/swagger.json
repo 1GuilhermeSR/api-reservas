@@ -5,14 +5,36 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/hotels": {
+    "/reservar/{idhotel}/{idquarto}": {
       "get": {
         "tags": [
-          "Hotels"
+          "Reservas"
         ],
-        "summary": "Find all hotels.",
-        "description": "Returns a list of all hotels.",
-        "responses": {
+        "summary": "Consultar reservas.",
+        "description": "Returna uma lista com todas as reservas para um hotel e quarto especifico",
+        "parameters": [
+          {
+            "name": "idhotel",
+            "in": "path",
+            "description": "ID do hotel",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer"
+            }
+          },
+
+          {
+            "name": "idquarto",
+            "in": "path",
+            "description": "ID do quarto",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],"responses": {
           "200": {
             "description": "OK",
             "content": {
@@ -20,28 +42,24 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Hotel"
+                    "$ref": "#/components/schemas/Reserva"
                   }
                 },
                 "example": [
-                  {
-                    "id": 1,
-                    "name": "Hotel California",
-                    "city": "Los Angeles",
-                    "address": "1670 Ocean Avenue"
-                  },
-                  {
-                    "id": 2,
-                    "name": "Hotel Transylvania",
-                    "city": "Hunedoara",
-                    "address": "Piața Iuliu Maniu, no. 11"
-                  },
-                  {
-                    "id": 3,
-                    "name": "The Plaza",
-                    "city": "New York",
-                    "address": "Fifth Avenue at Central Park South"
-                  }
+                 {
+                    "dataFin": "Fri, 05 Jan 2024 00:00:00 GMT",
+                    "dataIni": "Mon, 01 Jan 2024 00:00:00 GMT",
+                    "idreserva": 1,
+                    "idhotel": 1,
+                    "idquarto": 1
+                },
+                {
+                    "dataFin": "Wed, 10 Jan 2024 00:00:00 GMT",
+                    "dataIni": "Sat, 06 Jan 2024 00:00:00 GMT",
+                    "idreserva": 2,
+                    "idhotel": 1,
+                    "idquarto": 1
+                }
                 ]
               }
             }
@@ -54,30 +72,33 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
                 "example": {
-                  "message": "Could not find any hotel"
+                  "message": "Reserva não encontrada"
                 }
               }
             }
           }
         }
-      },
-      "put": {
+      }
+    },
+    "/reservar": {
+        "post": {
         "tags": [
-          "Hotels"
+          "Reservas"
         ],
-        "summary": "Add a new hotel.",
-        "description": "Creates a new hotel and returns it.",
+        "summary": "Criar uma nova reserva",
+        "description": "Cria uma nova reserva e retorna o objeto em json",
         "requestBody": {
-          "description": "Hotel Object",
+          "description": "Reserva Object",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Hotel"
+                "$ref": "#/components/schemas/Reserva"
               },
               "example": {
-                "name": "Hotel California",
-                "city": "Los Angeles",
-                "address": "1670 Ocean Avenue"
+                  "idhotel": 1,
+                  "idquarto": 1,
+                  "dataIni": "2024-01-01 00:00:00",
+                  "dataFin": "2024-01-06 00:00:00"
               }
             }
           }
@@ -88,13 +109,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Hotel"
+                  "$ref": "#/components/schemas/Reserva"
                 },
                 "example": {
-                  "id": 1,
-                  "name": "Hotel California",
-                  "city": "Los Angeles",
-                  "address": "1670 Ocean Avenue"
+                    "dataFin": "Sat, 06 Jan 2024 00:00:00 GMT",
+                    "dataIni": "Mon, 01 Jan 2024 00:00:00 GMT",
+                    "idreserva": 1,
+                    "idhotel": 1,
+                    "idquarto": 1
                 }
               }
             }
@@ -107,7 +129,20 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
                 "example": {
-                  "message": "Missing address, cannot insert"
+                  "message": "Faltando body ou parametros"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Conflito de datas, nao foi possivel reservar"
                 }
               }
             }
@@ -115,133 +150,18 @@
         }
       }
     },
-    "/api/hotels/{id}": {
-      "get": {
-        "tags": [
-          "Hotels"
-        ],
-        "summary": "Find a hotel by ID.",
-        "description": "Returns a hotel.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "hotel ID",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Hotel"
-                },
-                "example": {
-                  "id": 1,
-                  "name": "Hotel California",
-                  "city": "Los Angeles",
-                  "address": "1670 Ocean Avenue"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "example": {
-                  "message": "Could not find hotel with that id"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "Hotels"
-        ],
-        "summary": "Update an existing hotel by ID.",
-        "description": "Updates an existing hotel and returns it.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Hotel ID",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Hotel Object",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Hotel"
-              },
-              "example": {
-                "name": "Hotel California",
-                "city": "Los Angeles",
-                "address": "1670 Ocean Avenue"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Hotel"
-                },
-                "example": {
-                  "id": 1,
-                  "name": "Hotel California",
-                  "city": "Los Angeles",
-                  "address": "1670 Ocean Avenue"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "example": {
-                  "message": "Hotel doesn't exist, cannot update"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/reservar/{idreserva}": {
       "delete": {
         "tags": [
-          "Hotels"
+          "Reservas"
         ],
-        "summary": "Remove an existing hotel by ID.",
-        "description": "Removes an existing hotel and returns an empty body.",
+        "summary": "Deleta uma reserva por ID",
+        "description": "Utilizado apenas pela api de cancelamento para excluir reservas",
         "parameters": [
           {
-            "name": "id",
+            "name": "idreserva",
             "in": "path",
-            "description": "Hotel ID",
+            "description": "ID da reserva",
             "required": true,
             "style": "simple",
             "schema": {
@@ -250,8 +170,22 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reserva"
+                },
+                "example": {
+                    "dataFin": "Sat, 06 Jan 2024 00:00:00 GMT",
+                    "dataIni": "Mon, 01 Jan 2024 00:00:00 GMT",
+                    "idreserva": 1,
+                    "idhotel": 1,
+                    "idquarto": 1
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -261,7 +195,7 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
                 "example": {
-                  "message": "Hotel doesn't exist, cannot delete"
+                  "message": "Reserva nao existe, nao foi possivel deletar"
                 }
               }
             }
@@ -282,34 +216,39 @@
         },
         "additionalProperties": false
       },
-      "Hotel": {
+      "Reserva": {
         "required": [
-          "id",
-          "name",
-          "city",
-          "address"
+          "idreserva",
+          "idHotel",
+          "idQuarto",
+          "dataIni",
+          "dataFin"
         ],
         "type": "object",
         "properties": {
-          "id": {
+          "idreserva": {
             "type": "integer",
             "format": "int32",
-            "minLength": 1,
             "nullable": false
           },
-          "name": {
-            "minLength": 1,
-            "type": "string",
+          "idHotel": {
+            "type": "integer",
+            "format": "int32",
             "nullable": false
           },
-          "city": {
-            "minLength": 1,
-            "type": "string",
+          "idQuarto": {
+            "type": "integer",
+            "format": "int32",
             "nullable": false
           },
-          "address": {
-            "minLength": 1,
+          "dataIni": {
             "type": "string",
+            "format": "date-time",
+            "nullable": false
+          },
+          "dataFin": {
+            "type": "string",
+            "format": "date-time",
             "nullable": false
           }
         },
