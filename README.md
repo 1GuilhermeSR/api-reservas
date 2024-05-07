@@ -1,14 +1,12 @@
 # api-reservas
 
-## Swagger Documentation
+## Documentação Swagger
 
 + /swagger
 
-## Methods
+## Métodos
 
-API methods are defined as follows:
-
-| Metodos  | Descrição                      |
+| Métodos  | Descrição                      |
 |----------|--------------------------------|
 | `GET`    | Retorna uma lista de reservas. |
 | `POST`   | Cria uma nova reserva.         |
