@@ -110,21 +110,24 @@ def consultarReserva(idhotel, idquarto):
 
 @app.route('/reservar', methods=['POST'])
 def reservar():
-    data = request.json
-    idhotel = data['idhotel']
-    idquarto = data['idquarto']
-    dataIni = data['dataIni']
-    dataFin = data['dataFin']
-    if not data:
-        return jsonify({'error': 'Faltando body, nao foi possivel reservar'}), 400
-    if not data['idhotel']:
-        return jsonify({'error': 'Faltando idhotel, nao foi possivel reservar'}), 400
-    elif not data['idquarto']:
-        return jsonify({'error': 'Faltando idquarto, nao foi possivel reservar'}), 400
-    elif not data['dataIni']:
-        return jsonify({'error': 'Faltando dataIni, nao foi possivel reservar'}), 400
-    elif not data['dataFin']:
-        return jsonify({'error': 'Faltando dataFin, nao foi possivel reservar'}), 400
+    try:
+        data = request.json
+        idhotel = data['idhotel']
+        idquarto = data['idquarto']
+        dataIni = data['dataIni']
+        dataFin = data['dataFin']
+        if not data:
+            return jsonify({'error': 'Faltando body, nao foi possivel reservar'}), 400
+        if not data['idhotel']:
+            return jsonify({'error': 'Faltando idhotel, nao foi possivel reservar'}), 400
+        elif not data['idquarto']:
+            return jsonify({'error': 'Faltando idquarto, nao foi possivel reservar'}), 400
+        elif not data['dataIni']:
+            return jsonify({'error': 'Faltando dataIni, nao foi possivel reservar'}), 400
+        elif not data['dataFin']:
+            return jsonify({'error': 'Faltando dataFin, nao foi possivel reservar'}), 400
+    except KeyError as err:
+        return jsonify({'error': 'Faltando body ou parametros'}), 400
 
     try:
         dataInicio = datetime.strptime(dataIni, "%Y-%m-%d %H:%M:%S").date()
